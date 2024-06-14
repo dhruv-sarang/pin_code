@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "876188091041",
+    "project_id": "pin-code-d6c26",
+    "storage_bucket": "pin-code-d6c26.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:876188091041:android:91ef9efa173137143866e0",
+        "android_client_info": {
+          "package_name": "com.example.pin_code"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbrTdmOzwzBb2j60fXeNKez--afnUHZHg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
