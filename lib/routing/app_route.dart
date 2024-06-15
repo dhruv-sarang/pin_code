@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:pin_code/screens/home/home_screen.dart';
-
 import '../constant/app_constant.dart';
 import '../screens/add_ofc/add_shop.dart';
 import '../screens/allOffice/allOffice.dart';
@@ -31,7 +30,7 @@ class AppRoute {
 
       default:
         return MaterialPageRoute(
-          builder: (context) => SplashScreen(),
+          builder: (context) => HomeScreen(),
         );
     }
   }
