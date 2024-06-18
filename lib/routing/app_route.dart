@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pin_code/screens/home/home_screen.dart';
 import '../constant/app_constant.dart';
-import '../screens/add_ofc/add_shop.dart';
+import '../screens/add_ofc/add_ofc.dart';
 import '../screens/allOffice/allOffice.dart';
 import '../screens/splash/splash_screen.dart';
 

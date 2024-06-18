@@ -13,6 +13,29 @@ class _QuickSearchViewState extends State<QuickSearchView> {
   final TextEditingController _searchController = TextEditingController();
   List<Office> _quickSearchResults = [];
 
+  final FirebaseService _service = FirebaseService();
+
+  Future<void> updateIsLike(String? id, bool isFavorite) async {
+    try {
+      bool isUpdateSuccessful = await _service.updateIsLike(id!, isFavorite);
+
+      if (isUpdateSuccessful) {
+        print('isLike field updated successfully!');
+      } else {
+        print('Failed to update isLike field.');
+      }
+    } catch (e) {
+      print('Failed to update isLike field: $e');
+    }
+  }
+
+  void toggleFavoriteStatus(Office office) {
+    setState(() {
+      office.isLike = !office.isLike;
+      updateIsLike(office.id, office.isLike);
+    });
+  }
+
   void _searchByStateName(String query) async {
     if (query.isNotEmpty) {
       final results = await FirebaseService().searchItemByStateName(query);
@@ -62,7 +85,7 @@ class _QuickSearchViewState extends State<QuickSearchView> {
     }
   }
 
-  @override
+  /*@override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Column(
@@ -222,6 +245,172 @@ class _QuickSearchViewState extends State<QuickSearchView> {
           )
         ],
       ),
+    );
+  }*/
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomScrollView(
+      slivers: <Widget>[
+        SliverToBoxAdapter(
+          child: Container(
+            width: double.infinity,
+            height: 60,
+            color: Colors.deepOrange,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Expanded(
+                  child: RadioListTile(
+                    title: Text(
+                      'BY PIN',
+                      style:
+                          TextStyle(fontSize: 10, fontWeight: FontWeight.w600),
+                    ),
+                    value: 1,
+                    groupValue: selectedRadio,
+                    onChanged: (val) {
+                      setState(() {
+                        selectedRadio = val!;
+                      });
+                      // setSelectedRadio(val);
+                    },
+                  ),
+                ),
+                Expanded(
+                  child: RadioListTile(
+                    title: Text(
+                      'By State',
+                      style:
+                          TextStyle(fontSize: 10, fontWeight: FontWeight.w600),
+                    ),
+                    value: 2,
+                    groupValue: selectedRadio,
+                    onChanged: (val) {
+                      setState(() {
+                        selectedRadio = val!;
+                      }); // setSelectedRadio(val);
+                    },
+                  ),
+                ),
+                Expanded(
+                  child: RadioListTile(
+                    title: Text(
+                      'By Office Name',
+                      style:
+                          TextStyle(fontSize: 10, fontWeight: FontWeight.w600),
+                    ),
+                    value: 3,
+                    groupValue: selectedRadio,
+                    onChanged: (val) {
+                      setState(() {
+                        selectedRadio = val!;
+                      }); // setSelectedRadio(val);
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: [
+                Icon(Icons.search),
+                SizedBox(
+                  width: 16,
+                ),
+                Expanded(
+                  child: TextField(
+                    controller: _searchController,
+                    onChanged: (value) {
+                      _handleSearch(value);
+                    },
+                    decoration: InputDecoration(
+                      labelText: 'Enter text',
+                      // suffixIcon: Icon(Icons.cancel_outlined),
+                      labelStyle: TextStyle(color: Colors.black),
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.blue),
+                      ),
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(width: 2.0, color: Colors.blue),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        SliverToBoxAdapter(
+          child: SizedBox(height: 16),
+        ),
+        SliverList(
+          delegate: SliverChildBuilderDelegate(
+            (BuildContext context, int index) {
+              Office ofc = _quickSearchResults[index];
+              return Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            height: 50,
+                            width: 100,
+                            decoration: BoxDecoration(
+                                color: Colors.red.shade300,
+                                borderRadius: BorderRadius.circular(10)),
+                            child: Center(child: Text('${ofc.pinCode}')),
+                          ),
+                          SizedBox(
+                            width: 16,
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('${ofc.ofcName}'),
+                              Text('${ofc.taluka}, ${ofc.state}'),
+                            ],
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: <Widget>[
+                          InkWell(
+                            onTap: () {
+                              toggleFavoriteStatus(ofc);
+                            },
+                            child: Icon(
+                              ofc.isLike
+                                  ? Icons.favorite
+                                  : Icons.favorite_border,
+                              color: Colors.red,
+                            ),
+                          ),
+                          SizedBox(
+                            width: 8,
+                          ),
+                          Icon(Icons.share),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+            childCount: _quickSearchResults.length,
+          ),
+        ),
+      ],
     );
   }
 }

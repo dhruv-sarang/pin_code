@@ -13,6 +13,7 @@ class Office {
   String? division;
   String? region;
   String? circle;
+  bool isLike;
 
   Office(
       {this.id,
@@ -28,7 +29,8 @@ class Office {
       this.headOfc,
       this.division,
       this.region,
-      this.circle});
+      this.circle,
+      required this.isLike});
 
   Map<String, dynamic> toMap() {
     return {
@@ -46,6 +48,7 @@ class Office {
       'division': this.division,
       'region': this.region,
       'circle': this.circle,
+      'isLike': this.isLike,
     };
   }
 
@@ -65,6 +68,7 @@ class Office {
       division: map['division'] as String,
       region: map['region'] as String,
       circle: map['circle'] as String,
+      isLike: map['isLike'] as bool,
     );
   }
 }

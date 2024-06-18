@@ -57,6 +57,7 @@ class FirebaseService {
         division: division,
         region: region,
         circle: circle,
+        isLike: false
       );
 
       if (ofcId == null) {
@@ -90,6 +91,23 @@ class FirebaseService {
         values.forEach((key, value) {
           final ofc = Office.fromMap(value);
           ofcList.add(ofc);
+        });
+      }
+      return ofcList;
+    });
+  }
+
+  Stream<List<Office>> getSavedOfcStream() {
+    return _databaseReference.child("ofc").onValue.map((event) {
+      List<Office> ofcList = [];
+      if (event.snapshot.exists) {
+        Map<dynamic, dynamic> values =
+        event.snapshot.value as Map<dynamic, dynamic>;
+        values.forEach((key, value) {
+          final ofc = Office.fromMap(value);
+          if (ofc.isLike!) {
+            ofcList.add(ofc);
+          }
         });
       }
       return ofcList;
@@ -173,79 +191,27 @@ class FirebaseService {
         .toList();
   }
 
-  final Map<String, ValueNotifier<bool>> _favorites = {};
-
-  // void toggleFavorite(String productId) {
-  //     final ref = _databaseReference
-  //         .child('ofc');
-  //     ref.get().then((snapshot) async {
-  //       final isFavoriteNow = !snapshot.exists;
-  //       if (isFavoriteNow) {
-  //         await ref.set(true);
-  //       } else {
-  //         await ref.remove();
-  //       }
-  //
-  //       // Update the local ValueNotifier for this product's favorite status
-  //       _favorites[productId]?.value = isFavoriteNow;
-  //     });
-  // }
-  //
-  // void removeFavorite(String productId) {
-  //     _databaseReference
-  //         .child('ofc')
-  //         .remove();
-  //
-  // }
-  //
-  // Future<bool> getFavorite(String productId) async {
-  //     final snapshot = await _databaseReference
-  //         .child('ofc')
-  //         .get();
-  //     if (snapshot.exists) {
-  //       return true;
-  //     } else {
-  //       return false;
-  //     }
-  //
-  // }
-  //
-  // ValueNotifier<bool> getFavoriteNotifier(String productId) {
-  //   // If the notifier doesn't exist, create it with a default value of false
-  //   _favorites.putIfAbsent(productId, () => ValueNotifier<bool>(false));
-  //   return _favorites[productId]!;
-  // }
-  //
-  // void updateFavorites(bool isFavorite, String productId) {
-  //   _favorites[productId]?.value = isFavorite;
-  // }
-  //
-  // Future<List<String>> fetchUserFavoriteItemIds(String userId) async {
-  //   final snapshot = await _database.ref().child('userFavorites/$userId').get();
-  //   if (snapshot.exists && snapshot.value != null) {
-  //     Map<dynamic, dynamic> favorites =
-  //     Map<dynamic, dynamic>.from(snapshot.value as Map<dynamic, dynamic>);
-  //     return favorites.keys.cast<String>().toList();
-  //   } else {
-  //     return [];
-  //   }
-  // }
-  //
-  //
-  // Stream<List<Map<dynamic, dynamic>>> fetchUserFavoriteItemsStream() {
-  //   var userId = _auth.currentUser!.uid;
-  //
-  //   // Stream.fromFuture is used here if fetchUserFavoriteItemIds returns a Future.
-  //   // If it's already a Stream, you can directly use it without Stream.fromFuture.
-  //   return Stream.fromFuture(fetchUserFavoriteItemIds(userId)).asyncMap((favoriteItemIds) async {
-  //     // Using Future.wait to concurrently fetch all item details
-  //     var futures = favoriteItemIds.map((itemId) => fetchItemDetails(itemId));
-  //     List<Map<dynamic, dynamic>> favoriteItemsDetails = await Future.wait(futures);
-  //     // Filtering out empty or null itemDetails if necessary
-  //     return favoriteItemsDetails.where((itemDetails) => itemDetails.isNotEmpty).toList();
-  //   });
-  // }
 
 
+  Future<bool> updateIsLike(String officeId, bool newIsLikeValue) async {
+    try {
+      // Get the reference to the specific office node in the database
+      DatabaseReference officeRef = _databaseReference.child('ofc').child(officeId);
+
+      // Fetch the current office data
+      DataSnapshot snapshot = await officeRef.get();
+      if (!snapshot.exists) {
+        return false; // Office with the given ID not found
+      }
+
+      // Update the 'isLike' field to the new value
+      await officeRef.update({'isLike': newIsLikeValue});
+
+      return true; // Successfully updated 'isLike' field
+    } catch (e) {
+      print('Error updating isLike field: $e');
+      return false; // Error occurred while updating
+    }
+  }
 
 }
